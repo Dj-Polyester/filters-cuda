@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/cudabench.h
+cudadebug.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/cudadebug.h
+
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/cudadebug.h
+debug.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/debug.h
+
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/debug.h
+
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/gamma.h
+global.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/global.h
+
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/global.h
+iostream
+-
+opencv4/opencv2/opencv.hpp
+-
+cudabench.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/cudabench.h
+
+/home/polyester/Desktop/Programming/CG/CUDA/filters/src/gamma.cu
+../include/gamma.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/gamma.h
+
+/home/polyester/Desktop/Programming/CG/CUDA/filters/src/main.cu
+../include/gamma.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/gamma.h
+
