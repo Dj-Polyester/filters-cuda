@@ -23,7 +23,7 @@
     CUDADBG(cudaEventSynchronize(stop), );             \
     float ms = 0;                                      \
     CUDADBG(cudaEventElapsedTime(&ms, start, stop), ); \
-    std::cerr << time(ms) << std::endl
+    std::cout << time(ms)
 
 #else
 
