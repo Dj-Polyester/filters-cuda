@@ -2,6 +2,8 @@
 WARPSIZE=32
 MAXBLOCKSIZE=1024
 filterfunc=$1
+logfile="logs/$filterfunc.log"
+imginpath=img_in/*
 
 bench1d() {
 imgpath=$1
@@ -10,8 +12,6 @@ imgbasename=$(basename $imgpath)
 
 imgname="${imgbasename%%.*}"
 imgext="${imgbasename#*.}"
-
-logfile="logs/$filterfunc.log"
 
 echo $imgbasename >> $logfile
 
@@ -30,7 +30,12 @@ done
 printf "\n" >> $logfile
 }
 
-for imgpath in img_in/*
+rm -f $logfile
+
+imgfiles=$(ls $imginpath | wc -l)
+echo $imgfiles >> $logfile
+
+for imgpath in $imginpath
 do
 set -x
 bench1d $imgpath
