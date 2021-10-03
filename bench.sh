@@ -1,5 +1,6 @@
 
 WARPSIZE=32
+MAXBLOCKSIZE=1024
 filterfunc=$1
 
 bench1d() {
@@ -14,21 +15,17 @@ logfile="logs/$filterfunc.log"
 
 echo $imgbasename >> $logfile
 
-blocksize=$WARPSIZE
-while [ $blocksize -lt 544 ]
+for ((blocksize = $WARPSIZE ; blocksize <= $MAXBLOCKSIZE ; blocksize+=$WARPSIZE))
 do
 printf "$blocksize " >> $logfile
-((blocksize+=$WARPSIZE))
 done
 printf "\n" >> $logfile
 
-blocksize=$WARPSIZE
-while [ $blocksize -lt 544 ]
+for ((blocksize = $WARPSIZE ; blocksize <= $MAXBLOCKSIZE ; blocksize+=$WARPSIZE))
 do
 newimg="${imgname}_${filterfunc}_${blocksize}.${imgext}"
 val=$(./build/main ./$imgpath ./img_out/$newimg $filterfunc $blocksize)
 printf "$val " >> $logfile
-((blocksize+=$WARPSIZE))
 done
 printf "\n" >> $logfile
 }
