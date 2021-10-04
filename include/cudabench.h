@@ -24,6 +24,12 @@
     float ms = 0;                                      \
     CUDADBG(cudaEventElapsedTime(&ms, start, stop), ); \
     std::cout << time(ms)
+#define CUDABENCH(expr)   \
+    {                     \
+        STARTCUDABENCH(); \
+        expr;             \
+        STOPCUDABENCH();  \
+    }
 
 #else
 
@@ -32,6 +38,7 @@
 #define STOPCUDABENCH()
 #define PRINTCUDABENCH(time)
 #define PRINTCUDABENCH2(time)
+#define CUDABENCH(expr) expr
 
 #endif // LITTLEBENCH
 #endif // CUDABENCH

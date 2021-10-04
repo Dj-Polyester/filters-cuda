@@ -1,18 +1,41 @@
 import random
 import sys
+
 import numpy as np
 # import tkinter
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.widgets import CheckButtons
+
 matplotlib.use('TkAgg')
+
 filterfunc = sys.argv[1]
 
-fig = plt.figure()
+fig = plt.figure(figsize=(30, 10))
 ax = fig.add_subplot(111)
 
+plots = []
+labels = []
+visibility = []
+
+
+def annotatePlot(x, y):
+    anns = []
+    for i, j in zip(x, y):
+        anns.append(ax.annotate(j, xy=(i, j)))
+    return anns
+
+
+def rmAnnotations(anns):
+    for ann in anns:
+        ann.remove()
+
+
+xmax = None
+ymax = None
 with open(f"logs/{filterfunc}.log") as logfile:
     times = int(logfile.readline()[:-1])
-    for _ in range(times):
+    for time in range(times):
         imgfiles = int(logfile.readline()[:-1])
         for i in range(imgfiles):
             imgname = logfile.readline()[:-1]
@@ -22,16 +45,55 @@ with open(f"logs/{filterfunc}.log") as logfile:
             x = np.array(list(map(int, xStr.split())))
             y = np.array(list(map(float, yStr.split())))
 
-            ax.plot(x, y, c=(random.random(), random.random(), random.random()), label=imgname,
-                    marker="o")
-            for i, j in zip(x, y):
-                ax.annotate(j, xy=(i, j))
-            ax.vlines(x, 0, y, linestyle="dashed")
+            xmax = x.max()
+            ymax = y.max()
+
+            lbl = f"{imgname.split('.')[0]}_{time}"
+
+            pl = ax.plot(x, y, c=(random.random(), random.random(), random.random()), label=lbl,
+                         marker="o")
+
+            dic = {
+                "plot": pl,
+                "annotations": annotatePlot(
+                    x, y),
+                "x": x,
+                "y": y, }
+
+            plots.append(dic)
+            labels.append(lbl)
+            visibility.append(True)
+
+            ax.vlines(x, 0, ymax, linestyle="dashed")
             plt.xticks(x)
 
+# Make checkbuttons with all plotted lines with correct visibility
+rax = plt.axes([0, 0, 0.1, 0.15])
+check = CheckButtons(rax, labels, visibility)
+
+
+def func(label):
+    index = labels.index(label)
+    dic = plots[index]
+    lines = dic["plot"]
+    vis = None
+    for line in lines:
+        vis = not line.get_visible()
+        line.set_visible(vis)
+    if vis:
+        dic["annotations"] = annotatePlot(dic["x"], dic["y"])
+    else:
+        rmAnnotations(dic["annotations"])
+
+    plt.draw()
+
+
+check.on_clicked(func)
+
+
 plt.legend()
-plt.xlim(0, None)
-plt.ylim(0, None)
+plt.xlim(0, xmax)
+plt.ylim(0, ymax)
 plt.xlabel('blocksize')
 plt.ylabel('time (ms)')
 plt.show()
