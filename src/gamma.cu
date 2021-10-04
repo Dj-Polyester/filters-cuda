@@ -5,46 +5,69 @@
 
 __global__ void gammaAvgKernel(
     unsigned char *dstimg,
-    const int cn,
+    const int cn, const unsigned char howmany,
     const size_t numOfPixels,
-    float r, float g, float b)
+    float r, float g, float b, float a)
 {
     unsigned i = blockDim.x * blockIdx.x + threadIdx.x;
     unsigned icn = i * cn;
 
     if (i < numOfPixels)
     {
-        float result = dstimg[icn + 0] * b +
-                       dstimg[icn + 1] * g +
-                       dstimg[icn + 2] * r;
-        dstimg[icn + 0] = result; //B
-        dstimg[icn + 1] = result; //G
-        dstimg[icn + 2] = result; //R
-        // pimage[icn + 3] *= result; //A
+        float result = 0;
+        switch (howmany)
+        {
+        case 4:
+            result += dstimg[icn + 3] * a;
+        case 3:
+            result += dstimg[icn + 0] * b;
+        case 2:
+            result += dstimg[icn + 1] * g;
+        case 1:
+            result += dstimg[icn + 2] * r;
+        }
+        switch (howmany)
+        {
+        case 4:
+            dstimg[icn + 3] = result;
+        case 3:
+            dstimg[icn + 0] = result;
+        case 2:
+            dstimg[icn + 1] = result;
+        case 1:
+            dstimg[icn + 2] = result;
+        }
     }
 }
 __global__ void gammaKernel(
     unsigned char *dstimg,
-    const int cn,
+    const int cn, const unsigned char howmany,
     const size_t numOfPixels,
-    float r, float g, float b)
+    float r, float g, float b, float a)
 {
     unsigned i = blockDim.x * blockIdx.x + threadIdx.x;
     unsigned icn = i * cn;
 
     if (i < numOfPixels)
     {
-        dstimg[icn + 0] *= b; //B
-        dstimg[icn + 1] *= g; //G
-        dstimg[icn + 2] *= r; //R
-        // pimage[icn + 3] *= result; //A
+        switch (howmany)
+        {
+        case 4:
+            dstimg[icn + 3] *= a;
+        case 3:
+            dstimg[icn + 0] *= b;
+        case 2:
+            dstimg[icn + 1] *= g;
+        case 1:
+            dstimg[icn + 2] *= r;
+        }
     }
 }
 
 void gammaFilter(
-    const cv::Mat &image,
-    float r, float g, float b,
-    void (*gammaFunc)(unsigned char *, const int, const size_t, float, float, float),
+    const cv::Mat &image, const unsigned char howmany,
+    float r, float g, float b, float a,
+    void (*gammaFunc)(unsigned char *, const int, const unsigned char, const size_t, float, float, float, float),
     const int blockSize)
 {
     INITCUDADBG();
@@ -52,6 +75,9 @@ void gammaFilter(
     const size_t numOfPixels = image.total();
     const int cn = image.channels();
     const size_t numOfElems = cn * numOfPixels;
+
+    if (howmany > cn)
+        ERROR("gamma size greater than number of channels.", )
 
     unsigned char *dstimg;
 
@@ -62,7 +88,7 @@ void gammaFilter(
     INITCUDABENCH();
 
     STARTCUDABENCH();
-    gammaFunc<<<gridSize, blockSize>>>(dstimg, cn, numOfPixels, r, g, b);
+    gammaFunc<<<gridSize, blockSize>>>(dstimg, cn, howmany, numOfPixels, r, g, b, a);
     CUDACHECK();
     STOPCUDABENCH();
     PRINTGAMMABENCH();
@@ -73,10 +99,10 @@ void gammaFilter(
 
 __global__ void gammaAvgKernel2d(
     unsigned char *dstimg,
-    const int cn,
+    const int cn, const unsigned char howmany,
     const size_t width, const size_t height,
     const size_t numOfPixels,
-    float r, float g, float b)
+    float r, float g, float b, float a)
 {
     unsigned x = blockDim.x * blockIdx.x + threadIdx.x;
     unsigned y = blockDim.y * blockIdx.y + threadIdx.y;
@@ -85,21 +111,37 @@ __global__ void gammaAvgKernel2d(
 
     if (i < numOfPixels)
     {
-        float result = dstimg[icn + 0] * b +
-                       dstimg[icn + 1] * g +
-                       dstimg[icn + 2] * r;
-        dstimg[icn + 0] = result; //B
-        dstimg[icn + 1] = result; //G
-        dstimg[icn + 2] = result; //R
-        // pimage[icn + 3] *= result; //A
+        float result = 0;
+        switch (howmany)
+        {
+        case 4:
+            result += dstimg[icn + 3] * a;
+        case 3:
+            result += dstimg[icn + 0] * b;
+        case 2:
+            result += dstimg[icn + 1] * g;
+        case 1:
+            result += dstimg[icn + 2] * r;
+        }
+        switch (howmany)
+        {
+        case 4:
+            dstimg[icn + 3] = result;
+        case 3:
+            dstimg[icn + 0] = result;
+        case 2:
+            dstimg[icn + 1] = result;
+        case 1:
+            dstimg[icn + 2] = result;
+        }
     }
 }
 __global__ void gammaKernel2d(
     unsigned char *dstimg,
-    const int cn,
+    const int cn, const unsigned char howmany,
     const size_t width, const size_t height,
     const size_t numOfPixels,
-    float r, float g, float b)
+    float r, float g, float b, float a)
 {
     unsigned x = blockDim.x * blockIdx.x + threadIdx.x;
     unsigned y = blockDim.y * blockIdx.y + threadIdx.y;
@@ -108,17 +150,24 @@ __global__ void gammaKernel2d(
 
     if (i < numOfPixels)
     {
-        dstimg[icn + 0] *= b; //B
-        dstimg[icn + 1] *= g; //G
-        dstimg[icn + 2] *= r; //R
-        // pimage[icn + 3] *= result; //A
+        switch (howmany)
+        {
+        case 4:
+            dstimg[icn + 3] *= a;
+        case 3:
+            dstimg[icn + 0] *= b;
+        case 2:
+            dstimg[icn + 1] *= g;
+        case 1:
+            dstimg[icn + 2] *= r;
+        }
     }
 }
 
 void gammaFilter2d(
-    const cv::Mat &image,
-    float r, float g, float b,
-    void (*gammaFunc2d)(unsigned char *, const int, const size_t, const size_t, const size_t, float, float, float),
+    const cv::Mat &image, const unsigned char howmany,
+    float r, float g, float b, float a,
+    void (*gammaFunc2d)(unsigned char *, const int, const unsigned char, const size_t, const size_t, const size_t, float, float, float, float),
     const int blockWidth,
     const int blockHeight)
 {
@@ -128,6 +177,11 @@ void gammaFilter2d(
     const int cn = image.channels();
     const size_t numOfElems = cn * numOfPixels;
     const int width = image.cols;
+    if (howmany > cn)
+    {
+        ERROR("gamma size greater than number of channels.", )
+    }
+
     const int height = image.rows;
 
     unsigned char *dstimg;
@@ -140,7 +194,7 @@ void gammaFilter2d(
     INITCUDABENCH();
 
     STARTCUDABENCH();
-    gammaFunc2d<<<gridSize, blockSize>>>(dstimg, cn, width, height, numOfPixels, r, g, b);
+    gammaFunc2d<<<gridSize, blockSize>>>(dstimg, cn, howmany, width, height, numOfPixels, r, g, b, a);
     CUDACHECK();
     STOPCUDABENCH();
     PRINTGAMMABENCH();

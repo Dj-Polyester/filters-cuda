@@ -25,11 +25,11 @@ int main(int argc, char **argv)
     {
         if (filterName == "gammaKernel")
         {
-            gammaFilter(image, .600, .200, .200, gammaKernel, std::stoi(argv[4]));
+            gammaFilter(image, 3, .600, .200, .200, 0, gammaKernel, std::stoi(argv[4]));
         }
         else if (filterName == "gammaAvgKernel")
         {
-            gammaFilter(image, .600, .200, .200, gammaAvgKernel, std::stoi(argv[4]));
+            gammaFilter(image, 3, .600, .200, .200, 0, gammaAvgKernel, std::stoi(argv[4]));
         }
         else if (filterName == "greyScale")
         {
@@ -40,11 +40,11 @@ int main(int argc, char **argv)
     {
         if (filterName == "gammaKernel2d")
         {
-            gammaFilter2d(image, .600, .200, .200, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
+            gammaFilter2d(image, 3, .600, .200, .200, 0, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
         }
         else if (filterName == "gammaAvgKernel2d")
         {
-            gammaFilter2d(image, .600, .200, .200, gammaAvgKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
+            gammaFilter2d(image, 4, .600, .100, .100, .100, gammaAvgKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
         }
         else if (filterName == "greyScale2d")
         {

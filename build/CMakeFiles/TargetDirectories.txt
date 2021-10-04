@@ -1,3 +1,0 @@
-/home/polyester/Desktop/Programming/CG/CUDA/filters/build/CMakeFiles/rebuild_cache.dir
-/home/polyester/Desktop/Programming/CG/CUDA/filters/build/CMakeFiles/edit_cache.dir
-/home/polyester/Desktop/Programming/CG/CUDA/filters/build/CMakeFiles/main.dir

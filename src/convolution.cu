@@ -21,7 +21,10 @@ __global__ void mooreFilter2d(
     unsigned ndiv2 = windowWidth / 2;
     if (x < width - ndiv2 && x > ndiv2 - 1 && y < height - ndiv2 && y > ndiv2 - 1)
     {
-        unsigned sum0 = 0, sum1 = 0, sum2 = 0;
+        unsigned *sums = new unsigned[cn];
+        for (size_t i = 0; i < cn; ++i)
+            sums[i] = 0;
+
         const size_t winSizecn = windowSize * cn;
         const size_t winWidthcn = windowWidth * cn;
 
@@ -32,25 +35,28 @@ __global__ void mooreFilter2d(
             for (size_t i = 0; i < windowWidth; ++i, icn += cn, tmp += cn)
             {
                 // printf("(%u,%u) index: %lu, cn: %u, indexcn: %lu, icn: %lu, tmp: %lu, winSizecn: %lu\n", x, y, index, cn, indexcn, icn, tmp, winSizecn);
-                sum0 += window[icn + 0] * srcimg[tmp + 0];
-                sum1 += window[icn + 1] * srcimg[tmp + 1];
-                sum2 += window[icn + 2] * srcimg[tmp + 2];
+                for (unsigned char j = 0; j < cn; ++j)
+                    sums[j] += window[icn + j] * srcimg[tmp + j];
             }
             // printf("(%u,%u) loop1 out\n", x, y);
             tmp = tmp + (width * cn) - winWidthcn;
         }
         // printf("(%u,%u) loop2 out\n", x, y);
 
-        dstimg[indexcn + 0] = sum0 / windowSize;
-        dstimg[indexcn + 1] = sum1 / windowSize;
-        dstimg[indexcn + 2] = sum2 / windowSize;
+        for (unsigned char j = 0; j < cn; ++j)
+        {
+            dstimg[indexcn + j] = sums[j] / windowSize;
+        }
+        delete[] sums;
     }
     else
     {
-        dstimg[indexcn + 0] = srcimg[indexcn + 0];
-        dstimg[indexcn + 1] = srcimg[indexcn + 1];
-        dstimg[indexcn + 2] = srcimg[indexcn + 2];
+        for (unsigned char j = 0; j < cn; ++j)
+        {
+            dstimg[indexcn + j] = srcimg[indexcn + j];
+        }
     }
+    // printf("(%u,%u) (%u,%u,%u) (%u,%u,%u)\n", x, y, srcimg[indexcn + 0], srcimg[indexcn + 1], srcimg[indexcn + 2], dstimg[indexcn + 0], dstimg[indexcn + 1], dstimg[indexcn + 2]);
 }
 
 void convolve2d(
