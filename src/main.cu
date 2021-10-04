@@ -1,5 +1,6 @@
 
 #include "../include/gamma.h"
+#include "../include/convolution.h"
 
 int main(int argc, char **argv)
 {
@@ -18,41 +19,41 @@ int main(int argc, char **argv)
     if (!image.isContinuous())
         ERROR("image is not continuous", );
 
-    const size_t numOfPixels = image.total();
-    const int cn = image.channels();
-    const size_t numOfElems = cn * numOfPixels;
-    const int width = image.cols;
-    const int height = image.rows;
     std::string filterName(argv[3]);
 
     if (argc == 5)
     {
         if (filterName == "gammaKernel")
         {
-            gammaFilter(image.data, cn, numOfPixels, numOfElems, .600, .200, .200, gammaKernel, std::stoi(argv[4]));
+            gammaFilter(image, .600, .200, .200, gammaKernel, std::stoi(argv[4]));
         }
         else if (filterName == "gammaAvgKernel")
         {
-            gammaFilter(image.data, cn, numOfPixels, numOfElems, .600, .200, .200, gammaAvgKernel, std::stoi(argv[4]));
+            gammaFilter(image, .600, .200, .200, gammaAvgKernel, std::stoi(argv[4]));
         }
         else if (filterName == "greyScale")
         {
-            greyScale(image.data, cn, numOfPixels, numOfElems, std::stoi(argv[4]));
+            greyScale(image, std::stoi(argv[4]));
         }
     }
     if (argc == 6)
     {
         if (filterName == "gammaKernel2d")
         {
-            gammaFilter2d(image.data, cn, width, height, numOfPixels, numOfElems, .600, .200, .200, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
+            gammaFilter2d(image, .600, .200, .200, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
         }
         else if (filterName == "gammaAvgKernel2d")
         {
-            gammaFilter2d(image.data, cn, width, height, numOfPixels, numOfElems, .600, .200, .200, gammaAvgKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
+            gammaFilter2d(image, .600, .200, .200, gammaAvgKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
         }
         else if (filterName == "greyScale2d")
         {
-            greyScale2d(image.data, cn, width, height, numOfPixels, numOfElems, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5]));
+            greyScale2d(image, std::stoi(argv[4]), std::stoi(argv[5]));
+        }
+        else if (filterName == "convolve2d")
+        {
+            Window window(3, image.channels(), WindowType::mean);
+            convolve2d(image, window, mooreFilter2d, std::stoi(argv[4]), std::stoi(argv[5]));
         }
     }
 

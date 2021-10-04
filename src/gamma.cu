@@ -42,19 +42,21 @@ __global__ void gammaKernel(
 }
 
 void gammaFilter(
-    unsigned char *img,
-    const int cn,
-    const size_t numOfPixels,
-    const size_t numOfElems,
+    const cv::Mat &image,
     float r, float g, float b,
     void (*gammaFunc)(unsigned char *, const int, const size_t, float, float, float),
     const int blockSize)
 {
     INITCUDADBG();
+
+    const size_t numOfPixels = image.total();
+    const int cn = image.channels();
+    const size_t numOfElems = cn * numOfPixels;
+
     unsigned char *dstimg;
 
     CUDADBG(cudaMalloc(&dstimg, numOfElems * sizeof(unsigned char)), );
-    CUDADBG(cudaMemcpy(dstimg, img, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
+    CUDADBG(cudaMemcpy(dstimg, image.data, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
 
     const int gridSize = (numOfPixels - 1) / blockSize + 1;
     INITCUDABENCH();
@@ -65,7 +67,7 @@ void gammaFilter(
     STOPCUDABENCH();
     PRINTGAMMABENCH();
 
-    CUDADBG(cudaMemcpy(img, dstimg, numOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
+    CUDADBG(cudaMemcpy(image.data, dstimg, numOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
     CUDADBG(cudaFree(dstimg), );
 }
 
@@ -114,21 +116,24 @@ __global__ void gammaKernel2d(
 }
 
 void gammaFilter2d(
-    unsigned char *img,
-    const int cn,
-    const size_t width, const size_t height,
-    const size_t numOfPixels,
-    const size_t numOfElems,
+    const cv::Mat &image,
     float r, float g, float b,
     void (*gammaFunc2d)(unsigned char *, const int, const size_t, const size_t, const size_t, float, float, float),
     const int blockWidth,
     const int blockHeight)
 {
     INITCUDADBG();
+
+    const size_t numOfPixels = image.total();
+    const int cn = image.channels();
+    const size_t numOfElems = cn * numOfPixels;
+    const int width = image.cols;
+    const int height = image.rows;
+
     unsigned char *dstimg;
 
     CUDADBG(cudaMalloc(&dstimg, numOfElems * sizeof(unsigned char)), );
-    CUDADBG(cudaMemcpy(dstimg, img, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
+    CUDADBG(cudaMemcpy(dstimg, image.data, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
 
     const dim3 blockSize(blockWidth, blockHeight, 1);
     const dim3 gridSize((width - 1) / blockWidth + 1, (height - 1) / blockHeight + 1, 1);
@@ -140,6 +145,6 @@ void gammaFilter2d(
     STOPCUDABENCH();
     PRINTGAMMABENCH();
 
-    CUDADBG(cudaMemcpy(img, dstimg, numOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
+    CUDADBG(cudaMemcpy(image.data, dstimg, numOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
     CUDADBG(cudaFree(dstimg), );
 }

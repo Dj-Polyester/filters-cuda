@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/convolution.h
+global.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/global.h
+
 /home/polyester/Desktop/Programming/CG/CUDA/filters/include/cudabench.h
 cudadebug.h
 /home/polyester/Desktop/Programming/CG/CUDA/filters/include/cudadebug.h
@@ -28,11 +32,9 @@ opencv4/opencv2/opencv.hpp
 cudabench.h
 /home/polyester/Desktop/Programming/CG/CUDA/filters/include/cudabench.h
 
-/home/polyester/Desktop/Programming/CG/CUDA/filters/src/gamma.cu
-../include/gamma.h
-/home/polyester/Desktop/Programming/CG/CUDA/filters/include/gamma.h
-
 /home/polyester/Desktop/Programming/CG/CUDA/filters/src/main.cu
 ../include/gamma.h
 /home/polyester/Desktop/Programming/CG/CUDA/filters/include/gamma.h
+../include/convolution.h
+/home/polyester/Desktop/Programming/CG/CUDA/filters/include/convolution.h
 

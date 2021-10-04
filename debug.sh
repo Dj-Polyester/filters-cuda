@@ -1,0 +1,1 @@
+./build/main ./img_in/image2.png ./img_out/image2.png convolve2d 32 32

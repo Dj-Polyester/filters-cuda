@@ -2,6 +2,7 @@
 WARPSIZE=32
 MAXBLOCKSIZE=1024
 filterfunc=$1
+howmanytimes=$2
 logfile="logs/$filterfunc.log"
 imginpath=img_in/*
 
@@ -33,11 +34,14 @@ printf "\n" >> $logfile
 rm -f $logfile
 
 imgfiles=$(ls $imginpath | wc -l)
+echo $howmanytimes >> $logfile
+for ((i = 0 ; i < $howmanytimes ; i++))
+do
 echo $imgfiles >> $logfile
-
 for imgpath in $imginpath
 do
 set -x
 bench1d $imgpath
 set +x
+done
 done
