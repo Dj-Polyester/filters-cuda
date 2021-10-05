@@ -7,6 +7,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import CheckButtons
 
+VISIBILITY = False
+
 
 def annotatePlot(x, y):
     anns = []
@@ -85,7 +87,6 @@ for filterfunc in filterfuncs:
                 pl = ax.plot(x, y, c=(random.random(), random.random(), random.random()), label=lbl,
                              marker="o")
 
-                vis = True
                 dic = {
                     "plot": pl,
                     "x": x,
@@ -93,9 +94,9 @@ for filterfunc in filterfuncs:
 
                 plots.append(dic)
                 labels.append(lbl)
-                visibility.append(vis)
+                visibility.append(VISIBILITY)
 
-                setVisibility(dic, vis)
+                setVisibility(dic, VISIBILITY)
 
                 ax.vlines(x, 0, ymax, linestyle="dashed")
                 plt.xticks(x)
