@@ -9,15 +9,6 @@ from matplotlib.widgets import CheckButtons
 
 matplotlib.use('TkAgg')
 
-filterfunc = sys.argv[1]
-
-fig = plt.figure(figsize=(30, 10))
-ax = fig.add_subplot(111)
-
-plots = []
-labels = []
-visibility = []
-
 
 def annotatePlot(x, y):
     anns = []
@@ -31,44 +22,61 @@ def rmAnnotations(anns):
         ann.remove()
 
 
-xmax = None
-ymax = None
-with open(f"logs/{filterfunc}.log") as logfile:
-    times = int(logfile.readline()[:-1])
-    for time in range(times):
-        imgfiles = int(logfile.readline()[:-1])
-        for i in range(imgfiles):
-            imgname = logfile.readline()[:-1]
-            xStr = logfile.readline()[:-1]
-            yStr = logfile.readline()[:-1]
+filterfuncs = sys.argv[1:]
 
-            x = np.array(list(map(int, xStr.split())))
-            y = np.array(list(map(float, yStr.split())))
+fig = plt.figure(figsize=(30, 10))
+ax = fig.add_subplot(111)
 
-            xmax = x.max()
-            ymax = y.max()
+plots = []
+labels = []
+visibility = []
 
-            lbl = f"{imgname.split('.')[0]}_{time}"
+xmax = float("-inf")
+ymax = float("-inf")
+totalimgs = 0
+for filterfunc in filterfuncs:
+    with open(f"logs/{filterfunc}.log") as logfile:
+        times = int(logfile.readline()[:-1])
+        for time in range(times):
+            imgfiles = int(logfile.readline()[:-1])
+            totalimgs += imgfiles
+            for i in range(imgfiles):
+                imgname = logfile.readline()[:-1]
+                xStr = logfile.readline()[:-1]
+                yStr = logfile.readline()[:-1]
 
-            pl = ax.plot(x, y, c=(random.random(), random.random(), random.random()), label=lbl,
-                         marker="o")
+                x = np.array(list(map(int, xStr.split())))
+                y = np.array(list(map(float, yStr.split())))
 
-            dic = {
-                "plot": pl,
-                "annotations": annotatePlot(
-                    x, y),
-                "x": x,
-                "y": y, }
+                xmaxTmp = x.max()
+                ymaxTmp = y.max()
 
-            plots.append(dic)
-            labels.append(lbl)
-            visibility.append(True)
+                if xmaxTmp > xmax:
+                    xmax = xmaxTmp
+                if ymaxTmp > ymax:
+                    ymax = ymaxTmp
 
-            ax.vlines(x, 0, ymax, linestyle="dashed")
-            plt.xticks(x)
+                lbl = f"{filterfunc}_{imgname.split('.')[0]}_{time}"
+
+                pl = ax.plot(x, y, c=(random.random(), random.random(), random.random()), label=lbl,
+                             marker="o")
+
+                dic = {
+                    "plot": pl,
+                    "annotations": annotatePlot(
+                        x, y),
+                    "x": x,
+                    "y": y, }
+
+                plots.append(dic)
+                labels.append(lbl)
+                visibility.append(True)
+
+                ax.vlines(x, 0, ymax, linestyle="dashed")
+                plt.xticks(x)
 
 # Make checkbuttons with all plotted lines with correct visibility
-rax = plt.axes([0, 0, 0.1, 0.15])
+rax = plt.axes([0.01, 0.02, 0.105, 0.02*totalimgs])
 check = CheckButtons(rax, labels, visibility)
 
 

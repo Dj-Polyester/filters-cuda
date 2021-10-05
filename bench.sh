@@ -2,8 +2,15 @@
 WARPSIZE=32
 MAXBLOCKSIZE=1024
 filterfunc=$1
+if [ "$#" -eq 3 ]
+then
 howmanytimes=$2
-logfile="logs/$filterfunc.log"
+filetosave=$3
+else
+howmanytimes=1
+filetosave=$filterfunc
+fi
+logfile="logs/$filetosave.log"
 imginpath=img_in/*
 
 bench1d() {
