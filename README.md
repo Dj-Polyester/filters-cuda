@@ -9,7 +9,7 @@ Compile - `./compile.sh`
 
 Execute for each file in `img_in` folder with `block_size` - `./exec.sh block_size` 
 
-Benchmark - `./bench.sh filterfunc [howmanytimes_to_run=1 new_file_name=filterfunc]`
+Benchmark - `./bench.sh filterfunc [howmanytimes_to_run=1 new_file=filterfunc]`
 
 Benchmarks are cached to be plotted later. List all benchmarks - `./list.sh`
 
