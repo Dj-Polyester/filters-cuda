@@ -2,7 +2,6 @@
 #define CUDADEBUG
 
 #include "debug.h"
-
 #ifdef LITTLEBUG
 #define INITCUDADBG() cudaError_t cudaErr
 #define CUDACHECK()                                                                          \

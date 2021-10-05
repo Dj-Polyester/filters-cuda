@@ -7,8 +7,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import CheckButtons
 
-matplotlib.use('TkAgg')
-
 
 def annotatePlot(x, y):
     anns = []
@@ -21,6 +19,32 @@ def rmAnnotations(anns):
     for ann in anns:
         ann.remove()
 
+
+def setVisibility(dic, vis):
+    lines = dic["plot"]
+    for line in lines:
+        line.set_visible(vis)
+    if vis:
+        dic["annotations"] = annotatePlot(dic["x"], dic["y"])
+    elif "annotations" in dic.keys():
+        rmAnnotations(dic["annotations"])
+
+
+def setCheckbox(index, vis): visibility[index] = vis
+
+
+def func(label):
+    index = labels.index(label)
+    dic = plots[index]
+    lines = dic["plot"]
+    line = lines[0]
+    vis = not line.get_visible()
+    setVisibility(dic, vis)
+    setCheckbox(index, vis)
+    plt.draw()
+
+
+matplotlib.use('TkAgg')
 
 filterfuncs = sys.argv[1:]
 
@@ -61,16 +85,17 @@ for filterfunc in filterfuncs:
                 pl = ax.plot(x, y, c=(random.random(), random.random(), random.random()), label=lbl,
                              marker="o")
 
+                vis = True
                 dic = {
                     "plot": pl,
-                    "annotations": annotatePlot(
-                        x, y),
                     "x": x,
                     "y": y, }
 
                 plots.append(dic)
                 labels.append(lbl)
-                visibility.append(True)
+                visibility.append(vis)
+
+                setVisibility(dic, vis)
 
                 ax.vlines(x, 0, ymax, linestyle="dashed")
                 plt.xticks(x)
@@ -78,23 +103,6 @@ for filterfunc in filterfuncs:
 # Make checkbuttons with all plotted lines with correct visibility
 rax = plt.axes([0.01, 0.02, 0.105, 0.02*totalimgs])
 check = CheckButtons(rax, labels, visibility)
-
-
-def func(label):
-    index = labels.index(label)
-    dic = plots[index]
-    lines = dic["plot"]
-    vis = None
-    for line in lines:
-        vis = not line.get_visible()
-        line.set_visible(vis)
-    if vis:
-        dic["annotations"] = annotatePlot(dic["x"], dic["y"])
-    else:
-        rmAnnotations(dic["annotations"])
-
-    plt.draw()
-
 
 check.on_clicked(func)
 

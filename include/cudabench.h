@@ -6,7 +6,6 @@
 #define MS(ms) ms
 #define US(ms) ms / 1000
 #define NS(ms) ms / 1000000
-
 #ifdef LITTLEBENCH
 #define INITCUDABENCH()                 \
     cudaEvent_t start, stop;            \
@@ -24,11 +23,11 @@
     float ms = 0;                                      \
     CUDADBG(cudaEventElapsedTime(&ms, start, stop), ); \
     std::cout << time(ms)
-#define CUDABENCH(expr)   \
-    {                     \
-        STARTCUDABENCH(); \
-        expr;             \
-        STOPCUDABENCH();  \
+#define CUDABENCHEXPR(expr) \
+    {                       \
+        STARTCUDABENCH();   \
+        expr;               \
+        STOPCUDABENCH();    \
     }
 
 #else
@@ -38,7 +37,7 @@
 #define STOPCUDABENCH()
 #define PRINTCUDABENCH(time)
 #define PRINTCUDABENCH2(time)
-#define CUDABENCH(expr) expr
+#define CUDABENCHEXPR(expr) expr
 
 #endif // LITTLEBENCH
 #endif // CUDABENCH

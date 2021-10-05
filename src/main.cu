@@ -20,28 +20,41 @@ int main(int argc, char **argv)
         ERROR("image is not continuous", );
 
     std::string filterName(argv[3]);
+    INITCUDADBG();
     INITCUDABENCH();
     if (argc == 5)
     {
         if (filterName == "gammaKernel")
-            CUDABENCH(gammaFilter(image, {.600, .200, .200}, gammaKernel, std::stoi(argv[4])));
+        {
+            CUDABENCHEXPR(gammaFilter(image, {.600, .200, .200}, gammaKernel, std::stoi(argv[4])));
+        }
 
         else if (filterName == "gammaAvgKernel")
-            CUDABENCH(gammaFilter(image, {.600, .200, .200}, gammaAvgKernel, std::stoi(argv[4])));
+        {
+            CUDABENCHEXPR(gammaFilter(image, {.600, .200, .200}, gammaAvgKernel, std::stoi(argv[4])));
+        }
 
         else if (filterName == "greyScale")
-            CUDABENCH(greyScale(image, std::stoi(argv[4])));
+        {
+            CUDABENCHEXPR(greyScale(image, std::stoi(argv[4])));
+        }
     }
     if (argc == 6)
     {
         if (filterName == "gammaKernel2d")
-            CUDABENCH(gammaFilter2d(image, {.200, .600, .200}, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5])));
+        {
+            CUDABENCHEXPR(gammaFilter2d(image, {.200, .600, .200}, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5])));
+        }
 
         else if (filterName == "gammaAvgKernel2d")
-            CUDABENCH(gammaFilter2d(image, {.600, .100, .100}, gammaAvgKernel2d, std::stoi(argv[4]), std::stoi(argv[5])));
+        {
+            CUDABENCHEXPR(gammaFilter2d(image, {.600, .100, .100}, gammaAvgKernel2d, std::stoi(argv[4]), std::stoi(argv[5])));
+        }
 
         else if (filterName == "greyScale2d")
-            CUDABENCH(greyScale2d(image, std::stoi(argv[4]), std::stoi(argv[5])));
+        {
+            CUDABENCHEXPR(greyScale2d(image, std::stoi(argv[4]), std::stoi(argv[5])));
+        }
 
         else if (filterName == "convolve2d")
         {
@@ -49,7 +62,7 @@ int main(int argc, char **argv)
             convolve2d(image, window, mooreFilter2d, std::stoi(argv[4]), std::stoi(argv[5]));
         }
     }
-    PRINTCUDABENCH2(MS)
+    PRINTCUDABENCH2(MS);
     cv::imwrite(argv[2], image);
     return 0;
 }
