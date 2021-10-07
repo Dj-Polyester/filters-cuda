@@ -1,3 +1,4 @@
+import pathlib
 import random
 import sys
 
@@ -6,7 +7,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import CheckButtons
-
+import os
 VISIBILITY = False
 
 
@@ -48,7 +49,7 @@ def func(label):
 
 matplotlib.use('TkAgg')
 
-filterfuncs = sys.argv[1:]
+logfilepaths = sys.argv[1:]
 
 fig = plt.figure(figsize=(30, 10))
 ax = fig.add_subplot(111)
@@ -60,8 +61,9 @@ visibility = []
 xmax = float("-inf")
 ymax = float("-inf")
 totalimgs = 0
-for filterfunc in filterfuncs:
-    with open(f"logs/{filterfunc}.log") as logfile:
+for logfilepath in logfilepaths:
+    with open(logfilepath) as logfile:
+        filterfunc = os.path.basename(logfilepath)
         times = int(logfile.readline()[:-1])
         for time in range(times):
             imgfiles = int(logfile.readline()[:-1])

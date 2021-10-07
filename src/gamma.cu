@@ -60,13 +60,11 @@ void gammaFilter(
     if (howmany > cn)
         ERROR("gamma size greater than number of channels.", )
 
-    unsigned char *dstimg;
     float *gammaValsPtr;
+    CUDADBG(cudaMalloc(&gammaValsPtr, numOfElems * sizeof(unsigned char) + howmany * sizeof(float)), );
+    unsigned char *dstimg = (unsigned char *)(gammaValsPtr + howmany);
 
-    CUDADBG(cudaMallocHost(&dstimg, numOfElems * sizeof(unsigned char)), );
     CUDADBG(cudaMemcpy(dstimg, image.data, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
-
-    CUDADBG(cudaMallocHost(&gammaValsPtr, howmany * sizeof(float)), );
     CUDADBG(cudaMemcpy(gammaValsPtr, gammaVals.data(), howmany * sizeof(float), cudaMemcpyHostToDevice), );
 
     const int gridSize = (numOfPixels - 1) / blockSize + 1;
@@ -75,8 +73,8 @@ void gammaFilter(
     CUDACHECK();
 
     CUDADBG(cudaMemcpy(image.data, dstimg, numOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
-    CUDADBG(cudaFreeHost(dstimg), );
-    CUDADBG(cudaFreeHost(gammaValsPtr), );
+    dstimg = NULL;
+    CUDADBG(cudaFree(gammaValsPtr), );
 }
 
 __global__ void gammaAvgKernel2d(
@@ -148,13 +146,11 @@ void gammaFilter2d(
         ERROR("gamma size greater than number of channels.", )
     }
 
-    unsigned char *dstimg;
     float *gammaValsPtr;
+    CUDADBG(cudaMalloc(&gammaValsPtr, numOfElems * sizeof(unsigned char) + howmany * sizeof(float)), );
+    unsigned char *dstimg = (unsigned char *)(gammaValsPtr + howmany);
 
-    CUDADBG(cudaMalloc(&dstimg, numOfElems * sizeof(unsigned char)), );
     CUDADBG(cudaMemcpy(dstimg, image.data, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
-
-    CUDADBG(cudaMalloc(&gammaValsPtr, howmany * sizeof(float)), );
     CUDADBG(cudaMemcpy(gammaValsPtr, gammaVals.data(), howmany * sizeof(float), cudaMemcpyHostToDevice), );
 
     const dim3 blockSize(blockWidth, blockHeight, 1);
@@ -164,5 +160,6 @@ void gammaFilter2d(
     CUDACHECK();
 
     CUDADBG(cudaMemcpy(image.data, dstimg, numOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
-    CUDADBG(cudaFree(dstimg), );
+    dstimg = NULL;
+    CUDADBG(cudaFree(gammaValsPtr), );
 }

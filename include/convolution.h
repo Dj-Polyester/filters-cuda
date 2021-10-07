@@ -46,4 +46,21 @@ void convolve2d(
     const int blockWidth,
     const int blockHeight);
 
+__global__ void mooreFilter(
+    const unsigned char *srcimg,
+    unsigned char *dstimg,
+    const size_t width,
+    const size_t height,
+    const winType *window,
+    const unsigned windowWidth,
+    const unsigned windowSize,
+    const unsigned windowElems,
+    const int cn);
+
+void convolve(
+    const cv::Mat &image,
+    const Window &window,
+    void (*convolveFunc)(const unsigned char *, unsigned char *, const size_t, const size_t, const winType *, const unsigned, const unsigned, const unsigned, const int),
+    const int blockSize);
+
 #endif // CONVOLUTION

@@ -29,7 +29,9 @@
         expr;               \
         STOPCUDABENCH();    \
     }
-
+#define CLEANUPCUDABENCH()              \
+    CUDADBG(cudaEventDestroy(start), ); \
+    CUDADBG(cudaEventDestroy(stop), )
 #else
 
 #define INITCUDABENCH()
@@ -38,6 +40,7 @@
 #define PRINTCUDABENCH(time)
 #define PRINTCUDABENCH2(time)
 #define CUDABENCHEXPR(expr) expr
+#define CLEANUPCUDABENCH()
 
 #endif // LITTLEBENCH
 #endif // CUDABENCH
