@@ -1,16 +1,26 @@
+BENCHMARKFOLDER="benchmarks"
+
+if [[ "$_" == "$0" ]]; then
 
 WARPSIZE=32
 MAXBLOCKSIZE=1024
 filterfunc=$1
-if [ "$#" -eq 3 ]
+if [ "$#" -eq 4 ]
 then
 howmanytimes=$2
 filetosave=$3
+winWidth=$4
+elif [ "$#" -eq 3 ]
+then
+howmanytimes=$2
+filetosave=$3
+winWidth=3
 else
 howmanytimes=1
 filetosave=$filterfunc
+winWidth=3
 fi
-logfile="logs/$filetosave.log"
+logfile="$BENCHMARKFOLDER/$filetosave.log"
 imginpath=img_in/*
 
 bench1d() {
@@ -32,7 +42,7 @@ printf "\n" >> $logfile
 for ((blocksize = $WARPSIZE ; blocksize <= $MAXBLOCKSIZE ; blocksize+=$WARPSIZE))
 do
 newimg="${imgname}_${filterfunc}_${blocksize}.${imgext}"
-val=$(./build/main ./$imgpath ./img_out/$newimg $filterfunc $blocksize)
+val=$(./build/main ./$imgpath ./img_out/$newimg $filterfunc $blocksize $winWidth)
 printf "$val " >> $logfile
 done
 printf "\n" >> $logfile
@@ -52,3 +62,5 @@ bench1d $imgpath
 set +x
 done
 done
+
+fi

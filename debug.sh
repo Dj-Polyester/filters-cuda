@@ -1,1 +1,1 @@
-./build/main ./img_in/image2.png ./img_out/image2.png convolve2d 32 32
+./build/main ./img_in/$1 ./img_out/$1 "${@:2}"

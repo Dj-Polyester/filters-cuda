@@ -7,13 +7,12 @@ Config with CMake - `./config.sh`
 
 Compile - `./compile.sh`
 
-Execute for each file in `img_in` folder with `block_size` - `./exec.sh block_size` 
+Execute for each file in `img_in` folder with `block_size` - `./exec.sh filterfunc block_size` 
 
-Benchmark - `./bench.sh filterfunc [howmanytimes_to_run=1 new_file=filterfunc]`
+Benchmark - `./bench.sh filterfunc [howmanytimes_to_run=1 new_file=filterfunc windowWidth=3]`
 
-Benchmarks are cached to be plotted later. List all benchmarks - `./list.sh`
+Benchmarks are cached to be plotted later in `$BENCHMARKFOLDER` folder with default value of `benchmarks`. 
+`plot.py` takes input as series of file paths as command line arguments. 
+Plot benchmarks - `./python3 plot.py file_paths_separated_by_space`. 
 
-Plotting file takes input from one (or more) of the names in the output of `./list.sh`.
-Plot benchmarks - `./python3 plot.py list_of_benchmarks_to_plot`. 
-
-Plot all available benchmarks - `./list.sh | xargs ./python3 plot.py`
+Plot all available benchmarks - `source bench.sh && ls $BENCHMARKFOLDER/* | xargs ./python3 plot.py`
