@@ -44,6 +44,11 @@ int main(int argc, char **argv)
         Window window(std::stoi(argv[5]), image.channels(), WindowType::mean);
         CUDABENCHEXPR(convolve(image, window, mooreFilter, std::stoi(argv[4])));
     }
+    else if (filterName == "convolveSeparable")
+    {
+        SeparableWindow window(std::stoi(argv[5]), image.channels(), WindowType::mean);
+        CUDABENCHEXPR(convolveSeparable(image, window, mooreFilterSeparableH, mooreFilterSeparableV, std::stoi(argv[4])));
+    }
     else if (filterName == "gammaKernel2d")
     {
         CUDABENCHEXPR(gammaFilter2d(image, {.200, .600, .200}, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5])));
@@ -61,7 +66,12 @@ int main(int argc, char **argv)
     else if (filterName == "convolve2d")
     {
         Window window(std::stoi(argv[6]), image.channels(), WindowType::mean);
-        CUDABENCHEXPR(convolve2d(image, window, mooreFilter2d, std::stoi(argv[4]), std::stoi(argv[5]));)
+        CUDABENCHEXPR(convolve2d(image, window, mooreFilter2d, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "convolve2dSeparable")
+    {
+        SeparableWindow window(std::stoi(argv[6]), image.channels(), WindowType::mean);
+        CUDABENCHEXPR(convolve2dSeparable(image, window, mooreFilter2dSeparableH, mooreFilter2dSeparableV, std::stoi(argv[4]), std::stoi(argv[5])));
     }
 
     PRINTCUDABENCH2(MS);

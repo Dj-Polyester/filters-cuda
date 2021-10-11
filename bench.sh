@@ -1,6 +1,7 @@
+#!/bin/bash
 BENCHMARKFOLDER="benchmarks"
 
-if [[ "$_" == "$0" ]]; then
+if [[ "$0" == "./bench.sh" ]]; then
 
 WARPSIZE=32
 MAXBLOCKSIZE=1024

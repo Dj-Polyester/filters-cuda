@@ -53,6 +53,9 @@ void gammaFilter(
 {
     INITCUDADBG();
 
+    cudaStream_t stream1;
+    CUDADBG(cudaStreamCreate(&stream1), );
+
     const size_t numOfPixels = image.total();
     const int cn = image.channels();
     const size_t numOfElems = cn * numOfPixels;
@@ -64,8 +67,9 @@ void gammaFilter(
     CUDADBG(cudaMalloc(&gammaValsPtr, numOfElems * sizeof(unsigned char) + howmany * sizeof(float)), );
     unsigned char *dstimg = (unsigned char *)(gammaValsPtr + howmany);
 
-    CUDADBG(cudaMemcpy(dstimg, image.data, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
-    CUDADBG(cudaMemcpy(gammaValsPtr, gammaVals.data(), howmany * sizeof(float), cudaMemcpyHostToDevice), );
+    CUDADBG(cudaMemcpyAsync(dstimg, image.data, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice, stream1), );
+    CUDADBG(cudaMemcpyAsync(gammaValsPtr, gammaVals.data(), howmany * sizeof(float), cudaMemcpyHostToDevice, 0), );
+    CUDADBG(cudaDeviceSynchronize(), );
 
     const int gridSize = (numOfPixels - 1) / blockSize + 1;
 
@@ -75,6 +79,8 @@ void gammaFilter(
     CUDADBG(cudaMemcpy(image.data, dstimg, numOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
     dstimg = NULL;
     CUDADBG(cudaFree(gammaValsPtr), );
+
+    CUDADBG(cudaStreamDestroy(stream1), );
 }
 
 __global__ void gammaAvgKernel2d(
