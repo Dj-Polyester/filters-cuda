@@ -2,10 +2,12 @@
 #include "../include/gamma.h"
 #include "../include/convolution.h"
 
+#define GETWINDOW
+
 int main(int argc, char **argv)
 {
-    if (argc != 5 && argc != 6 && argc != 7)
-        ERROR("usage: executable in out filter args", );
+    if (argc != 5 && argc != 6 && argc != 7 && argc != 8)
+        ERROR("usage: executable in out filter dims [windowargs]", );
     // set to page-locked (pinned memory)
     cv::Mat::setDefaultAllocator(cv::cuda::HostMem::getAllocator(cv::cuda::HostMem::AllocType::PAGE_LOCKED));
 
@@ -27,51 +29,55 @@ int main(int argc, char **argv)
 
     if (filterName == "gammaKernel")
     {
-        CUDABENCHEXPR(gammaFilter(image, {.600, .200, .200}, gammaKernel, std::stoi(argv[4])));
+        CUDABENCHEXPR(gammaFilter(image, {.200, .600, .200}, gammaKernel, std::stoi(argv[4]), std::stoi(argv[5])));
     }
-
     else if (filterName == "gammaAvgKernel")
     {
-        CUDABENCHEXPR(gammaFilter(image, {.600, .200, .200}, gammaAvgKernel, std::stoi(argv[4])));
+        CUDABENCHEXPR(gammaFilter(image, {.600, .100, .100}, gammaAvgKernel, std::stoi(argv[4]), std::stoi(argv[5])));
     }
-
     else if (filterName == "greyScale")
     {
-        CUDABENCHEXPR(greyScale(image, std::stoi(argv[4])));
+        CUDABENCHEXPR(greyScale(image, std::stoi(argv[4]), std::stoi(argv[5])));
     }
-    else if (filterName == "convolve")
-    {
-        Window window(std::stoi(argv[5]), image.channels(), WindowType::mean);
-        CUDABENCHEXPR(convolve(image, window, mooreFilter, std::stoi(argv[4])));
-    }
-    else if (filterName == "convolveSeparable")
-    {
-        SeparableWindow window(std::stoi(argv[5]), image.channels(), WindowType::mean);
-        CUDABENCHEXPR(convolveSeparable(image, window, mooreFilterSeparableH, mooreFilterSeparableV, std::stoi(argv[4])));
-    }
-    else if (filterName == "gammaKernel2d")
-    {
-        CUDABENCHEXPR(gammaFilter2d(image, {.200, .600, .200}, gammaKernel2d, std::stoi(argv[4]), std::stoi(argv[5])));
-    }
-
-    else if (filterName == "gammaAvgKernel2d")
-    {
-        CUDABENCHEXPR(gammaFilter2d(image, {.600, .100, .100}, gammaAvgKernel2d, std::stoi(argv[4]), std::stoi(argv[5])));
-    }
-
-    else if (filterName == "greyScale2d")
-    {
-        CUDABENCHEXPR(greyScale2d(image, std::stoi(argv[4]), std::stoi(argv[5])));
-    }
-    else if (filterName == "convolve2d")
+    else if (filterName == "mean")
     {
         Window window(std::stoi(argv[6]), image.channels(), WindowType::mean);
-        CUDABENCHEXPR(convolve2d(image, window, mooreFilter2d, std::stoi(argv[4]), std::stoi(argv[5])));
+        CUDABENCHEXPR(convolve(image, window, mooreFilter, std::stoi(argv[4]), std::stoi(argv[5])));
     }
-    else if (filterName == "convolve2dSeparable")
+    else if (filterName == "gaussian")
+    {
+        Window window(std::stoi(argv[6]), image.channels(), WindowType::gaussian, std::stoi(argv[7]));
+        CUDABENCHEXPR(convolve(image, window, mooreFilter, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "meanSeparable")
     {
         SeparableWindow window(std::stoi(argv[6]), image.channels(), WindowType::mean);
-        CUDABENCHEXPR(convolve2dSeparable(image, window, mooreFilter2dSeparableH, mooreFilter2dSeparableV, std::stoi(argv[4]), std::stoi(argv[5])));
+        CUDABENCHEXPR(convolveSeparable(image, window, mooreFilterSeparableH, mooreFilterSeparableV, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "gaussianSeparable")
+    {
+        SeparableWindow window(std::stoi(argv[6]), image.channels(), WindowType::gaussian, std::stoi(argv[7]));
+        CUDABENCHEXPR(convolveSeparable(image, window, mooreFilterSeparableH, mooreFilterSeparableV, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "meanShared")
+    {
+        Window window(std::stoi(argv[6]), image.channels(), WindowType::mean);
+        CUDABENCHEXPR(convolveShared(image, window, mooreFilterShared, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "gaussianShared")
+    {
+        Window window(std::stoi(argv[6]), image.channels(), WindowType::gaussian, std::stoi(argv[7]));
+        CUDABENCHEXPR(convolveShared(image, window, mooreFilterShared, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "meanSharedSep")
+    {
+        SeparableWindow window(std::stoi(argv[6]), image.channels(), WindowType::mean);
+        CUDABENCHEXPR(convolveSharedSep(image, window, mooreFilterSharedSep, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "gaussianSharedSep")
+    {
+        SeparableWindow window(std::stoi(argv[6]), image.channels(), WindowType::gaussian, std::stoi(argv[7]));
+        CUDABENCHEXPR(convolveSharedSep(image, window, mooreFilterSharedSep, std::stoi(argv[4]), std::stoi(argv[5])));
     }
 
     PRINTCUDABENCH2(MS);
