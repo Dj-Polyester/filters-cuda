@@ -1,6 +1,7 @@
 
 #include "../include/gamma.h"
 #include "../include/convolution.h"
+#include "../include/sampling.h"
 
 #define GETWINDOW
 
@@ -78,6 +79,14 @@ int main(int argc, char **argv)
     {
         SeparableWindow window(std::stoi(argv[6]), image.channels(), WindowType::gaussian, std::stoi(argv[7]));
         CUDABENCHEXPR(convolveSharedSep(image, window, mooreFilterSharedSep, std::stoi(argv[4]), std::stoi(argv[5])));
+    }
+    else if (filterName == "NN")
+    {
+        CUDABENCHEXPR(interpolate(image, NN, std::stoi(argv[4]), std::stoi(argv[5]), std::stoi(argv[6]), std::stoi(argv[7])));
+    }
+    else if (filterName == "bilinear")
+    {
+        CUDABENCHEXPR(interpolate(image, bilinear, std::stoi(argv[4]), std::stoi(argv[5]), std::stoi(argv[6]), std::stoi(argv[7])));
     }
 
     PRINTCUDABENCH2(MS);

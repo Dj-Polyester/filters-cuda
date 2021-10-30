@@ -1,0 +1,1 @@
+./build/main ./img_in/image2.png ./img_out/image2.png NN 16 16 16 16
