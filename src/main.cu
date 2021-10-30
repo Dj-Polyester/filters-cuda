@@ -88,6 +88,10 @@ int main(int argc, char **argv)
     {
         CUDABENCHEXPR(interpolate(image, bilinear, std::stoi(argv[4]), std::stoi(argv[5]), std::stoi(argv[6]), std::stoi(argv[7])));
     }
+    else if (filterName == "downsample")
+    {
+        CUDABENCHEXPR(downsample(image, downsampleKernel, std::stoi(argv[4]), std::stoi(argv[5]), std::stoi(argv[6]), std::stoi(argv[7])));
+    }
 
     PRINTCUDABENCH2(MS);
     cv::imwrite(argv[2], image);

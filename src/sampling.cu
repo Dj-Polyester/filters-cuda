@@ -103,3 +103,59 @@ void interpolate(cv::Mat &image,
     dstimg = NULL;
     CUDADBG(cudaFree(srcimg), );
 }
+
+__global__ void downsampleKernel(unsigned char *srcimg, unsigned char *dstimg, int cn, size_t width, size_t newwidth, unsigned factorx, unsigned factory)
+{
+    unsigned x = blockDim.x * blockIdx.x + threadIdx.x;
+    unsigned y = blockDim.y * blockIdx.y + threadIdx.y;
+    unsigned i = newwidth * y + x;
+    unsigned icn = i * cn;
+
+    unsigned oldx = x * factorx;
+    unsigned oldy = y * factory;
+    unsigned oldi = width * oldy + oldx;
+    unsigned oldicn = oldi * cn;
+
+    for (unsigned j = 0; j < cn; ++j, ++icn, ++oldicn)
+    {
+        dstimg[icn] = srcimg[oldicn];
+    }
+}
+
+void downsample(cv::Mat &image,
+                void (*downsampleFunc)(unsigned char *srcimg, unsigned char *dstimg, int cn, size_t width, size_t newwidth, unsigned factorx, unsigned factory),
+                const int blockWidth,
+                const int blockHeight,
+                unsigned factorx,
+                unsigned factory)
+{
+    INITCUDADBG();
+
+    const size_t numOfPixels = image.total();
+    const int cn = image.channels();
+    const size_t numOfElems = cn * numOfPixels;
+    const int width = image.cols;
+    const int height = image.rows;
+    const int newwidth = std::ceil(((float)width) / factorx);
+    const int newheight = std::ceil(((float)height) / factory);
+    const size_t newNumOfElems = cn * newwidth * newheight;
+
+    unsigned char *srcimg;
+    CUDADBG(cudaMalloc(&srcimg, (newNumOfElems + numOfElems) * sizeof(unsigned char)), );
+    unsigned char *dstimg = srcimg + numOfElems;
+
+    CUDADBG(cudaMemcpy(srcimg, image.data, numOfElems * sizeof(unsigned char), cudaMemcpyHostToDevice), );
+
+    const dim3 blockSize(blockWidth, blockHeight, 1);
+    const dim3 gridSize((newwidth - 1) / blockWidth + 1, (newheight - 1) / blockHeight + 1, 1);
+
+    downsampleFunc<<<gridSize, blockSize>>>(srcimg, dstimg, cn, width, newwidth, factorx, factory);
+    CUDACHECK();
+
+    image = cv::Mat(newheight, newwidth, CV_8UC(cn));
+
+    CUDADBG(cudaMemcpy(image.data, dstimg, newNumOfElems * sizeof(unsigned char), cudaMemcpyDeviceToHost), );
+
+    dstimg = NULL;
+    CUDADBG(cudaFree(srcimg), );
+}

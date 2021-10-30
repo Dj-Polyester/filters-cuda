@@ -14,4 +14,13 @@ void interpolate(cv::Mat &image,
                  unsigned factorx,
                  unsigned factory);
 
+__global__ void downsampleKernel(unsigned char *srcimg, unsigned char *dstimg, int cn, size_t width, size_t newwidth, unsigned factorx, unsigned factory);
+
+void downsample(cv::Mat &image,
+                void (*downsampleFunc)(unsigned char *srcimg, unsigned char *dstimg, int cn, size_t width, size_t newwidth, unsigned factorx, unsigned factory),
+                const int blockWidth,
+                const int blockHeight,
+                unsigned factorx,
+                unsigned factory);
+
 #endif // SAMPLING_H
