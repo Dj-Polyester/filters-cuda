@@ -9,7 +9,7 @@
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/main",
-            "args": "${workspaceFolder}/img_in/image2.png ${workspaceFolder}/image_out/image2NN.png NN 16 16 16 16"
+            "args": "${workspaceFolder}/img_in/darkside_greyScale.jpg ${workspaceFolder}/image_out/darkside_greyScale.jpg greyScaleTransform 16 16 0.2"
         }
     ]
 }
