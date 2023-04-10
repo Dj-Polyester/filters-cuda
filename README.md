@@ -1,5 +1,7 @@
 # filters-cuda
 
+Implementation for some of the image filters using CUDA. Currently color and convolutional filters are available.
+
 **NOTE:** 2d functions have implementations, however benchmarking is only available for 
 1d kernels, kernels that have 1d grid and block sizes.
 
